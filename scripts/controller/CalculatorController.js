@@ -40,8 +40,38 @@ class CalculatorController {
     this._operation.pop(); // pop: remove um item no array
   }
 
+  getLastOperation() {
+    return this._operation[this._operation.length-1]; // retorna o ultimo valor do array 
+  }
+
+  setLastOperation(value) {
+    this._operation[this._operation.length-1] = value;
+  }
+
+  isOperator(value) {
+    return (['+', '-', '*', '/', '%'].indexOf(value) > -1); // indexOf: busca o (value) dentro do array, se encontrar, retorna o index do array ([0],[1],[2],[3],[4] / caso não encontrar [-1])
+  }
+
   addOperation(value) {
-    this._operation.push(value); // push: adiciona um item no array 
+    // verifica se o ultimo digito é um numero
+    if(isNaN(this.getLastOperation())) { // se o que retornar da função getLastOperation for false, não é um número 
+      // string
+      if(this.isOperator(value)) { // verifica se o ultimo valor digitado é um operador
+        // trocar o operador
+        console.log(value);
+        this.setLastOperation(value);
+      } else if(isNaN(value)) {
+        // outra coisa
+        console.log(value);
+      } else {
+        this._operation.push(value);
+      }
+    } else {
+      // number
+       let valueString = this.getLastOperation().toString() + value.toString(); // último valor será convertido para string e concatena com o valor digitado 
+       this.setLastOperation(parseInt(valueString)); 
+    }
+    
     console.log(this._operation);
   }
 
@@ -61,27 +91,31 @@ class CalculatorController {
         break;
 
       case 'soma':
-
+        this.addOperation('+');
         break;
 
       case 'subtracao':
-      
+        this.addOperation('-');
         break;
 
       case 'divisao':
-
+        this.addOperation('/');
         break;
 
       case 'multiplicacao':
-
+        this.addOperation('*');
         break;
 
       case 'porcento':
-
+        this.addOperation('%');
         break;
 
       case 'igual':
 
+        break;
+
+      case 'ponto': 
+      this.addOperation('.');
         break;
         
       case '0':
