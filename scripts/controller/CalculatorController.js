@@ -52,6 +52,36 @@ class CalculatorController {
     return (['+', '-', '*', '/', '%'].indexOf(value) > -1); // indexOf: busca o (value) dentro do array, se encontrar, retorna o index do array ([0],[1],[2],[3],[4] / caso não encontrar [-1])
   }
 
+  pushOperation(value) {
+    this._operation.push(value);
+    
+    if(this._operation.length > 3) {
+      this.calculate();
+    }
+  }
+
+  calculate() {
+    let lastElement = this._operation.pop(); // auxilia para retirar o ultimo elemento caso seja um operador.
+    let result = eval(this._operation.join("")); // resultada da operação entre dois números
+
+    this._operation = [result, lastElement];
+
+    this.setLastNumberToDisplay(); // atualiza display
+  }
+
+  setLastNumberToDisplay() {
+    let lastNumber;
+
+    for(let i = this._operation.length-1; i >= 0; i--) { // variavel i inicia em (numeroDeItensNoArray) e enquanto esse número for menor ou igual a zero, o mesmo decrementará 
+      if(!this.isOperator(this._operation[i])) { // se o item na posição i do array operation não for um operador (ou seja, um número)
+        lastNumber = this._operation[i];
+        break;
+      }
+    }
+
+    this.displayCalculator = lastNumber; // display recebe o ultimo número digitado
+  }
+
   addOperation(value) {
     // verifica se o ultimo digito é um numero
     if(isNaN(this.getLastOperation())) { // se o que retornar da função getLastOperation for false, não é um número 
@@ -61,24 +91,26 @@ class CalculatorController {
         console.log(value);
         this.setLastOperation(value);
       } else if(isNaN(value)) {
-        // outra coisa
-        console.log(value);
+        console.log('Outra coisa', value);
       } else {
-        this._operation.push(value);
+        this.pushOperation(value);
+        this.setLastNumberToDisplay(); // atualiza display
       }
     } else {
       // number
-       let valueString = this.getLastOperation().toString() + value.toString(); // último valor será convertido para string e concatena com o valor digitado 
-       this.setLastOperation(parseInt(valueString)); 
+      if(this.isOperator(value)) { // verifica se o ultimo valor digitado é um operador
+        this.pushOperation(value);
+      } else { 
+        let valueString = this.getLastOperation().toString() + value.toString(); // último valor será convertido para string e concatena com o valor digitado 
+        this.setLastOperation(parseInt(valueString)); 
+        this.setLastNumberToDisplay(); // atualiza display
+      }
     }
-    
-    console.log(this._operation);
   }
 
   setError() {
     this.displayCalculator = "ERROR!";
   }
-
 
   executeButton(value) { // (valordobotão)
     switch(value) {
