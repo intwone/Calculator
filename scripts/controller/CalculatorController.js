@@ -24,6 +24,8 @@ class CalculatorController {
     setInterval(() => {
       this.setDisplayDateTime();
     }, 1000);
+
+    this.setLastNumberToDisplay();
   }
 
   addEventListenerAll(element, events, functions) {
@@ -34,10 +36,12 @@ class CalculatorController {
 
   clearAll() {
     this._operation = []; // limpa a tela, zerando o array
+    this.setLastNumberToDisplay();
   }
 
-  clearEntry() {
+  cancelEntry() {
     this._operation.pop(); // pop: remove um item no array
+    this.setLastNumberToDisplay();
   }
 
   getLastOperation() {
@@ -61,11 +65,24 @@ class CalculatorController {
   }
 
   calculate() {
-    let lastElement = this._operation.pop(); // auxilia para retirar o ultimo elemento caso seja um operador.
+    let lastElement = '';
+
+    if(this._operation.length > 3) {
+      let lastElement = this._operation.pop(); // auxilia para retirar o ultimo elemento caso seja um operador.
+    }
     let result = eval(this._operation.join("")); // resultada da operação entre dois números
 
-    this._operation = [result, lastElement];
+    if(lastElement == '%') {
+      result /= 100;
+      this._operation = [result];
+    } else {
+      this._operation = [result];
 
+      if(lastElement ) {
+        this._operation.push(lastElement);
+      }
+    }
+     
     this.setLastNumberToDisplay(); // atualiza display
   }
 
@@ -78,7 +95,9 @@ class CalculatorController {
         break;
       }
     }
-
+    if(!lastNumber ) {
+      lastNumber = 0;
+    }
     this.displayCalculator = lastNumber; // display recebe o ultimo número digitado
   }
 
@@ -101,14 +120,14 @@ class CalculatorController {
       if(this.isOperator(value)) { // verifica se o ultimo valor digitado é um operador
         this.pushOperation(value);
       } else { 
-        let valueString = this.getLastOperation().toString() + value.toString(); // último valor será convertido para string e concatena com o valor digitado 
-        this.setLastOperation(parseInt(valueString)); 
+        let newValue = this.getLastOperation().toString() + value.toString(); // último valor será convertido para string e concatena com o valor digitado 
+        this.setLastOperation(parseInt(newValue)); 
         this.setLastNumberToDisplay(); // atualiza display
       }
     }
   }
 
-  setError() {
+  setError() { 
     this.displayCalculator = "ERROR!";
   }
 
@@ -119,7 +138,7 @@ class CalculatorController {
         break;
 
       case 'ce':
-        this.clearEntry();
+        this.cancelEntry();
         break;
 
       case 'soma':
@@ -143,11 +162,11 @@ class CalculatorController {
         break;
 
       case 'igual':
-
+        this.calculate();
         break;
 
       case 'ponto': 
-      this.addOperation('.');
+        this.addOperation('.');
         break;
         
       case '0':
@@ -187,7 +206,7 @@ class CalculatorController {
         this.executeButton(textButton);
       });
 
-      this.addEventListenerAll(btn, "mouseup mousedown", functionEvent => {
+      this.addEventListenerAll(btn, "mouseover mouseup mousedown", functionEvent => {
         btn.style.cursor = "pointer"; // muda o estilo do cursor do mouse para "mão clicavel" 
       })
     }); 
@@ -213,7 +232,7 @@ class CalculatorController {
   get currentDate() {
     return new Date();
   }
-
+ 
   get displayTime() {
     return this._timeEl.innerHTML;
   }
