@@ -5,6 +5,8 @@ class CalculatorController {
    * constructor(parameters)
    */
   constructor() { 
+    this._lastOperator = '';
+    this._lastNumber = '';
     this._operation = [];
     this._language = 'pt-BR'
     this._displayCalculatorEl = document.querySelector("#display");
@@ -64,13 +66,28 @@ class CalculatorController {
     }
   }
 
+  getResult() {
+    return eval(this._operation.join("")); // resultado da operação entre dois números
+  }
+
   calculate() {
     let lastElement = '';
+    this._lastOperator = this.getLastItem();
+
+    if(this._operation.length < 3) {
+      let firstItem = this._operation[0];
+      this._operation = [firstItem, this._lastOperator, this._lastNumber];
+    }
 
     if(this._operation.length > 3) {
       let lastElement = this._operation.pop(); // auxilia para retirar o ultimo elemento caso seja um operador.
+      this._lastNumber = this.getResult(); 
+
+    } else if(this._operation.length == 3) {
+      this._lastNumber = this.getLastItem(false); 
     }
-    let result = eval(this._operation.join("")); // resultada da operação entre dois números
+
+    let result = this.getResult(); 
 
     if(lastElement == '%') {
       result /= 100;
@@ -86,15 +103,26 @@ class CalculatorController {
     this.setLastNumberToDisplay(); // atualiza display
   }
 
-  setLastNumberToDisplay() {
-    let lastNumber;
+  getLastItem(isOperator = true) {
+    let lastItem;
 
     for(let i = this._operation.length-1; i >= 0; i--) { // variavel i inicia em (numeroDeItensNoArray) e enquanto esse número for menor ou igual a zero, o mesmo decrementará 
-      if(!this.isOperator(this._operation[i])) { // se o item na posição i do array operation não for um operador (ou seja, um número)
-        lastNumber = this._operation[i];
+      if(this.isOperator(this._operation[i]) == isOperator) { // se o item na posição i do array operation não for um operador (ou seja, um número)
+        lastItem = this._operation[i];
         break;
       }
     }
+
+    if(!lastItem) {
+      lastItem = (isOperator) ? this._lastOperator : this._lastNumber;
+    }
+
+    return lastItem; 
+  }
+
+  setLastNumberToDisplay() {
+    let lastNumber = this.getLastItem(false);
+
     if(!lastNumber ) {
       lastNumber = 0;
     }
