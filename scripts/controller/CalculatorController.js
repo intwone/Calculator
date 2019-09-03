@@ -15,6 +15,7 @@ class CalculatorController {
     this._currentDate;
     this.initialize();
     this.initButtonEvents();
+    this.initKeyboard();
   }
 
   /**
@@ -23,11 +24,65 @@ class CalculatorController {
   initialize() { 
     this.setDisplayDateTime();
 
-    setInterval(() => {
+    setInterval(() => { 
       this.setDisplayDateTime();
     }, 1000);
 
     this.setLastNumberToDisplay();
+  }
+
+  initKeyboard() {
+    document.addEventListener('keyup', event =>{
+      switch(event.key) {
+        case 'Escape':
+          this.clearAll();
+          break;
+  
+        case 'Backspace':
+          this.cancelEntry();
+          break;
+  
+        case '+':
+        case '-':
+        case '*':
+        case '/':
+        case '%':
+          this.addOperation(event.key);
+          break;
+  
+        case 'Enter':
+        case '=':
+          this.calculate();
+          break;
+  
+        case '.': 
+        case ',': 
+          this.addDot();
+          break;
+          
+        case '0':
+  
+        case '1':
+  
+        case '2':
+  
+        case '3':
+  
+        case '4':
+  
+        case '5':
+  
+        case '6':
+          
+        case '7':
+  
+        case '8': 
+  
+        case '9':
+          this.addOperation(parseInt(event.key ));
+          break;
+      }
+    });
   }
 
   addEventListenerAll(element, events, functions) {
