@@ -172,7 +172,13 @@ class CalculatorController {
   }
 
   getResult() {
-    return eval(this._operation.join("")); // resultado da operação entre dois números
+    try {
+      return eval(this._operation.join("")); // resultado da operação entre dois números
+    } catch(error) {
+      setTimeout(() => {
+        this.setError();
+      }, 1);
+    }
   }
 
   calculate() {
@@ -394,6 +400,10 @@ class CalculatorController {
    * setters
    */
   set displayCalculator(value) {
+    if(value.toString().length > 10) {
+      this.setError();
+      return false;
+    }
     this._displayCalculatorEl.innerHTML = value;
   }
 
